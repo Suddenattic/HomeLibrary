@@ -73,8 +73,6 @@ public class WorkWithDB {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String createTable = "CREATE TABLE IF NOT EXISTS HomeLibrary (ID SERIAL, Author CHAR(100), Genre CHAR(50), Title CHAR(100)," +
                 " № INT, Size INT, Format CHAR(5), Date DATE, Language char(3));";
-//        String updateTable = "INSERT INTO HomeLibTest (Author, Genre, Title, №, Size, Format, Date, Language) " +
-//                "VALUES (" + data[0] + data[1] + data[2] + Integer.parseInt(data[3]) + Double.parseDouble(data[4]) + data[7] + format.parse(data[8]) + data[9] + ")";
         String updateTable = "INSERT INTO HomeLibTest (name, genre, title, №, size, format, date, language) " +
                 "VALUES (" + data[0] + ", " + data[1] + ", " + data[2] + ", " + Integer.parseInt(data[3]) + ", " +  Integer.parseInt(data[4]) + ", " + data[7] + ", " + format.parse(data[8]) + ", " + data[9] + ")";
 
