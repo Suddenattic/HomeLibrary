@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="apidocs">
-    <CLASSES />
-    <JAVADOC>
-      <root url="jar://F:/JavaModules/commons-compress-1.19-bin.zip!/commons-compress-1.19/apidocs" />
-    </JAVADOC>
-    <SOURCES />
-  </library>
-</component>

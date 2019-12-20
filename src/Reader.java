@@ -1,46 +1,44 @@
-/*C:\Users\kagel\Desktop\JavaTest\JavaTest.rar*/
-
-import com.github.junrar.Archive;
-import com.sun.xml.internal.ws.api.model.wsdl.WSDLOutput;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
-import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Scanner;
+import java.sql.*;
+import java.text.ParseException;
+import java.util.*;
+
+//F:\JavaProjects\LibrusecLibArchive\librusec_local_fb2.inpx
 
 public class Reader {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws SQLException, ParseException {
         reader();
+        //WorkWithDB.createDB();
     }
 
-    private static void reader() {
-        List<String> list = new ArrayList<>();
-        try (ZipFile zipFile = new ZipFile("C:\\Users\\kagel\\Desktop\\JavaTest\\JavaTest.zip")) {
+    private static void reader() throws ParseException {
+        Set<String> authorsSet = new TreeSet<>();
+        Map<Integer, String> authorsMap = new TreeMap<>();
+        List<String> authorsList = new ArrayList<>();
+        String[] buf;
+        try (ZipFile zipFile = new ZipFile("F:\\JavaProjects\\LibrusecLibArchive\\librusec_local_fb2.inpx")) {
             Enumeration<? extends ZipArchiveEntry> entries = zipFile.getEntries();
             while(entries.hasMoreElements()) {
                 ZipArchiveEntry entry = entries.nextElement();
                 if (!entry.isDirectory()) {
-                    final String fileName = entry.getName();
-                    if (fileName.endsWith(".txt")) {
-                        try (BufferedReader br = new BufferedReader(
-                                new InputStreamReader(zipFile.getInputStream(entry), StandardCharsets.UTF_8))) {
-                            while(br.ready())
-                                list.add(br.readLine());
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                    try (BufferedReader br = new BufferedReader(
+                            new InputStreamReader(zipFile.getInputStream(entry), StandardCharsets.UTF_8))) {
+                        while(br.ready()) {
+                            buf = (br.readLine().replaceAll("\u0004+", "\u0004")
+                                    .replaceAll(",|:|\\s+", " ").split("\u0004"));
+                            for(int i = 0; i < buf.length; i++)
+                                buf[i] = buf[i].trim();
+                            WorkWithDB.insertIntoDB(buf);
                         }
+                    } catch (IOException | SQLException e) {
+                        e.printStackTrace();
                     }
                 }
             }
-            for(String i : list)
-                System.out.println(i);
         } catch (IOException e) {
             e.printStackTrace();
         }
