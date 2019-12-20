@@ -26,7 +26,7 @@ public class Reader {
             Enumeration<? extends ZipArchiveEntry> entries = zipFile.getEntries();
             while(entries.hasMoreElements()) {
                 ZipArchiveEntry entry = entries.nextElement();
-                if (!entry.isDirectory()) {
+                if (!entry.isDirectory() && entry.getName().endsWith(".inp")) {
                     try (BufferedReader br = new BufferedReader(
                             new InputStreamReader(zipFile.getInputStream(entry), StandardCharsets.UTF_8));
                          BufferedWriter bw = new BufferedWriter(
@@ -39,11 +39,6 @@ public class Reader {
                             if(buf[0].endsWith(":"))
                                 buf[0] = buf[0].substring(0, buf[0].length() - 1);
                             subBuf = buf[0].split(":");
-                            /*for(int i = 0; i < subBuf.length; i ++) {
-                                authorsSet.add(subBuf[i].replaceAll("[.,]", " ").
-                                        replaceAll("\\s+", " ").
-                                        replaceAll(" :", ":").trim());
-                            }*/
                             for(int i = 0; i < subBuf.length; i ++) {
                                     authorsSet.add(subBuf[i].replaceAll("[.,]", " ").
                                             replaceAll("\\s+", " ").
@@ -53,13 +48,10 @@ public class Reader {
                                 authorsMap.put(buf[0], count++);
                             }*/
 //                            WorkWithDB.insertIntoDB(buf);
-
                         }
 
                        /* for(String i : authorsSet)
                             authorsMap.put(i, authorsSet.size() - (authorsSet.size() - count++));*/
-
-
 
                         /*for(Map.Entry<String, Integer> pair : authorsMap.entrySet()) {
                             bw.write(pair.getKey() + " - " + pair.getValue());
@@ -69,8 +61,6 @@ public class Reader {
                             bw.write(i);
                             bw.write("\r\n");
                         }
-                            /*System.out.println(i);*/
-
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -79,6 +69,7 @@ public class Reader {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println(authorsSet.size());
     }
  }
 
