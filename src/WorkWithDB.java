@@ -5,15 +5,11 @@ public class WorkWithDB {
     private static Statement statement = null;
 
     private static Connection DBConnection() {
-        final String DB_DRIVER = "org.postgresql.Driver";
-//        final String DB_ADDRESS = "jdbc:postgresql://localhost:5432/HomeLibrary";
-        final String DB_ADDRESS = "jdbc:postgresql://localhost/?user=postgres&password=postgres";
-        final String DB_USER = "admin";
-        final String DB_PASSWORD = "admin";
+        final String SERVER_ADDRESS = "jdbc:postgresql://localhost/?user=postgres&password=postgres";
         Connection dbConnection = null;
         try {
-            Class.forName(DB_DRIVER);
-            dbConnection = DriverManager.getConnection(DB_ADDRESS, DB_USER, DB_PASSWORD);
+            Class.forName("org.postgresql.Driver");
+            dbConnection = DriverManager.getConnection(SERVER_ADDRESS, "admin", "admin");
             return dbConnection;
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
@@ -25,17 +21,20 @@ public class WorkWithDB {
 
 
     static void createDB() throws SQLException {
-        String dbExistingCheck = "SELECT datname FROM pg_catalog.pg_database WHERE datname = 'homelibrary'";
-        String createDB = "CREATE DATABASE homelibrary";
+        final String DB_ADDRESS = "jdbc:postgresql://localhost/homelibrary";
+        final String createDB = "CREATE DATABASE homelibrary";
+        final String createAuthorsTable = "CREATE TABLE IF NOT EXISTS authors (ID SERIAL, Author CHAR(100))";
+        final String createBooksTable = "CREATE TABLE IF NOT EXISTS books (ID SERIAL, Title CHAR(100), Genre CHAR(50)," +
+                " № INT, Size INT, Format CHAR(5), Date DATE, Language char(3));";
         try {
             dbConnection = DBConnection();
-            statement = dbConnection.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet rs = statement.executeQuery(dbExistingCheck);
-            if(!rs.next())
-                statement.executeUpdate(createDB);
+            statement = dbConnection.createStatement();
+            statement.executeUpdate(createDB);
         } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println(e.getClass().getName() + ": " + e.getMessage());
+            dbConnection = DriverManager.getConnection(DB_ADDRESS, "admin", "admin");
+            statement = dbConnection.createStatement();
+            statement.executeUpdate(createAuthorsTable);
+            statement.executeUpdate(createBooksTable);
         } finally {
             if (statement != null) statement.close();
             if (dbConnection != null) dbConnection.close();
