@@ -1,7 +1,6 @@
 import java.sql.*;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Set;
 
 public class WorkWithDB {
@@ -12,9 +11,19 @@ public class WorkWithDB {
         final String SERVER_ADDRESS = "jdbc:postgresql://localhost/?user=postgres&password=postgres";
         final String DB_ADDRESS = "jdbc:postgresql://localhost/homelibrary";
         final String createDB = "CREATE DATABASE homelibrary";
-        final String createAuthorsTable = "CREATE TABLE IF NOT EXISTS authors (ID SERIAL, Author CHAR(150))";
-        final String createBooksTable = "CREATE TABLE IF NOT EXISTS books (ID SERIAL, Title CHAR(100), Genre CHAR(50)," +
-                " № INT, Size INT, Format CHAR(5), Date DATE, Language char(3));";
+        final String createAuthorsTable = "CREATE TABLE IF NOT EXISTS authors (ID SERIAL, Name CHAR(100))";
+        final String createBooksTable = "CREATE TABLE IF NOT EXISTS books (ID SERIAL, Title CHAR(200), Genre CHAR(200)," +
+                " Size INT, Format CHAR(5), Date DATE, Language char(5));";
+        /*final String createAuthorBookTable = "CREATE TABLE IF NOT EXISTS books (ID SERIAL, Title CHAR(200), Genre CHAR(200)," +
+                " Size INT, Format CHAR(5), Date DATE, Language char(5));";
+        final String createGenreTable = "CREATE TABLE IF NOT EXISTS books (ID SERIAL, Title CHAR(200), Genre CHAR(200)," +
+                " Size INT, Format CHAR(5), Date DATE, Language char(5));";
+        final String createGenreBookTable = "CREATE TABLE IF NOT EXISTS books (ID SERIAL, Title CHAR(200), Genre CHAR(200)," +
+                " Size INT, Format CHAR(5), Date DATE, Language char(5));";
+        final String createLanguageTable = "CREATE TABLE IF NOT EXISTS books (ID SERIAL, Title CHAR(200), Genre CHAR(200)," +
+                " Size INT, Format CHAR(5), Date DATE, Language char(5));";
+        final String createLanguageBookTable = "CREATE TABLE IF NOT EXISTS books (ID SERIAL, Title CHAR(200), Genre CHAR(200)," +
+                " Size INT, Format CHAR(5), Date DATE, Language char(5));";*/
         Connection dbConnection = null;
         try {
             Class.forName("org.postgresql.Driver");
@@ -48,23 +57,23 @@ public class WorkWithDB {
         return dbConnection;
     }
 
-    static void updateTables(Set<String> authors, Set<String> books) throws SQLException, ParseException {
+    static void updateTables(Set<String> authorsSet, List<String> booksList) throws SQLException {
+        String[] booksBuf;
         Calendar today = Calendar.getInstance();
         long time = today.getTimeInMillis();
         Date date = new Date(time);
 
-        String[] booksBuf;
         try {
             dbConnection = DBConnection();
-            PreparedStatement authorsUpdate = dbConnection.prepareStatement(
+           /* PreparedStatement authorsUpdate = dbConnection.prepareStatement(
                     "INSERT INTO public.authors(author) VALUES (?)");
             for (String i : authors) {
                 authorsUpdate.setString(1, i);
                 authorsUpdate.executeUpdate();
             }
             PreparedStatement booksUpdate = dbConnection.prepareStatement(
-                    "INSERT INTO public.books(title, genre, size, format, date, language) VALUES (?, ?, ?, ?, ?, ?)");
-            for (String i : books) {
+                    "INSERT INTO public.books(title, genre, size, format, date, language) VALUES (?, ?, ?, ?, ?, ?)");*/
+            /*for (String i : books) {
                 booksBuf = i.split("\u0004");
                 int k = 1;
                 for(int j = 0; j < booksBuf.length; j++) {
@@ -79,6 +88,35 @@ public class WorkWithDB {
                     k++;
                 }
                 booksUpdate.executeUpdate();
+            }*/
+
+            PreparedStatement authorsUpdate = dbConnection.prepareStatement(
+                    "INSERT INTO public.authors(name) VALUES (?)");
+            PreparedStatement booksUpdate = dbConnection.prepareStatement(
+                    "INSERT INTO public.books(title, genre, size, format, date, language) VALUES (?, ?, ?, ?, ?, ?)");
+
+            for(String i : authorsSet) {
+                authorsUpdate.setString(1, i);
+                authorsUpdate.executeUpdate();
+            }
+
+            for(String i : booksList) {
+                try {
+                    booksBuf = i.split("\u0004");
+                    if (booksBuf[0].length() > 200 || booksBuf[1].length() > 200) {
+                        System.out.println(i);
+                        continue;
+                    }
+                    booksUpdate.setString(1, booksBuf[1]);
+                    booksUpdate.setString(2, booksBuf[0]);
+                    booksUpdate.setInt(3, Integer.parseInt(booksBuf[5]));
+                    booksUpdate.setString(4, booksBuf[8]);
+                    booksUpdate.setDate(5, date);
+                    booksUpdate.setString(6, booksBuf[10]);
+                    booksUpdate.executeUpdate();
+                } catch (ArrayIndexOutOfBoundsException e) {
+                    System.out.println(i);
+                }
             }
         } catch (SQLException e) {
             System.err.println(e.getClass().getName() + ": " + e.getMessage());
