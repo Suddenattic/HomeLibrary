@@ -42,7 +42,11 @@
                       </grid>
                     </constraints>
                     <properties>
+                      <dividerLocation value="250"/>
                       <dividerSize value="5"/>
+                      <doubleBuffered value="false"/>
+                      <resizeWeight value="0.3"/>
+                      <visible value="true"/>
                     </properties>
                     <border type="none"/>
                     <children>
@@ -51,8 +55,10 @@
                           <splitpane position="right"/>
                         </constraints>
                         <properties>
+                          <dividerLocation value="300"/>
                           <dividerSize value="5"/>
                           <orientation value="0"/>
+                          <resizeWeight value="0.577"/>
                         </properties>
                         <border type="none"/>
                         <children>
@@ -60,7 +66,9 @@
                             <constraints>
                               <splitpane position="right"/>
                             </constraints>
-                            <properties/>
+                            <properties>
+                              <doubleBuffered value="true"/>
+                            </properties>
                             <border type="none"/>
                             <children/>
                           </grid>

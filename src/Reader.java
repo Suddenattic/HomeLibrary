@@ -12,14 +12,15 @@ import java.util.*;
 
 public class Reader {
     private static List<String> list = new ArrayList<>();
-    private static Set<String> authorsSet = new TreeSet<>();
-    private static List<String> booksList = new ArrayList<>();
-
 
     public static void main(String[] args) throws SQLException {
+        long startTime = System.currentTimeMillis();
         readFromArchive();
+        long timeSpent = System.currentTimeMillis() - startTime;
+        System.out.println("программа выполнялась " + timeSpent/1000d + " секунд");
     }
 
+    //Чтение файлов из архива
     private static void readFromArchive() throws SQLException {
         try (ZipFile zipFile = new ZipFile("F:\\JavaProjects\\LibrusecLibArchive\\librusec_local_fb2.inpx")) {
             Enumeration<? extends ZipArchiveEntry> entries = zipFile.getEntries();
@@ -37,22 +38,6 @@ public class Reader {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        lineEditor();
-    }
-
-    private static void lineEditor() throws SQLException {
-        String[] buf;
-        String[] authorsBuf;
-        for (String i : list) {
-            buf = i.split("\u0004",2);
-            authorsBuf = buf[0].split(":");
-            booksList.add(buf[1]);
-            for (String s : authorsBuf) {
-                authorsSet.add(s.replaceAll("[.,]", " ").
-                        replaceAll("\\s+", " ").trim());
-            }
-        }
-        WorkWithDB.updateTables(authorsSet, booksList);
+        WorkWithDB.lineEditor(list);
     }
 }
-
